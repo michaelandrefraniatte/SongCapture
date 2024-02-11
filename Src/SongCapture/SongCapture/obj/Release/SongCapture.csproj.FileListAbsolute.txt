@@ -50,3 +50,15 @@ C:\Users\micha\Documents\Perso\tool\SongCapture\Src\SongCapture\SongCapture\obj\
 C:\Users\micha\Documents\Perso\tool\SongCapture\Src\SongCapture\SongCapture\obj\Release\SongCapture.csproj.CopyComplete
 C:\Users\micha\Documents\Perso\tool\SongCapture\Src\SongCapture\SongCapture\obj\Release\SongCapture.exe
 C:\Users\micha\Documents\Perso\tool\SongCapture\Src\SongCapture\SongCapture\obj\Release\SongCapture.pdb
+C:\Users\micha\Documents\github\SongCaptureOfficial\Src\SongCapture\SongCapture\bin\Release\SongCapture.exe.config
+C:\Users\micha\Documents\github\SongCaptureOfficial\Src\SongCapture\SongCapture\bin\Release\SongCapture.exe
+C:\Users\micha\Documents\github\SongCaptureOfficial\Src\SongCapture\SongCapture\bin\Release\SongCapture.pdb
+C:\Users\micha\Documents\github\SongCaptureOfficial\Src\SongCapture\SongCapture\bin\Release\CSCore.xml
+C:\Users\micha\Documents\github\SongCaptureOfficial\Src\SongCapture\SongCapture\obj\Release\SongCapture.csproj.AssemblyReference.cache
+C:\Users\micha\Documents\github\SongCaptureOfficial\Src\SongCapture\SongCapture\obj\Release\SongCapture.Form1.resources
+C:\Users\micha\Documents\github\SongCaptureOfficial\Src\SongCapture\SongCapture\obj\Release\SongCapture.Properties.Resources.resources
+C:\Users\micha\Documents\github\SongCaptureOfficial\Src\SongCapture\SongCapture\obj\Release\SongCapture.csproj.GenerateResource.cache
+C:\Users\micha\Documents\github\SongCaptureOfficial\Src\SongCapture\SongCapture\obj\Release\SongCapture.csproj.CoreCompileInputs.cache
+C:\Users\micha\Documents\github\SongCaptureOfficial\Src\SongCapture\SongCapture\obj\Release\SongCapture.csproj.CopyComplete
+C:\Users\micha\Documents\github\SongCaptureOfficial\Src\SongCapture\SongCapture\obj\Release\SongCapture.exe
+C:\Users\micha\Documents\github\SongCaptureOfficial\Src\SongCapture\SongCapture\obj\Release\SongCapture.pdb
