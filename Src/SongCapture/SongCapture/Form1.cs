@@ -1,23 +1,15 @@
 ﻿using System;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.IO;
 using System.Diagnostics;
-using System.Management;
-using System.Security.Cryptography;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Threading;
-using System.Drawing;
-using System.ComponentModel;
-using System.Media;
-using CSCore;
-using CSCore.SoundIn;
-using CSCore.Codecs.WAV;
-using NAudio.Lame;
+using NAudio.CoreAudioApi;
 using NAudio.Wave;
+using NAudio.Lame;
+
 namespace SongCapture
 {
     public partial class Form1 : Form
@@ -41,6 +33,7 @@ namespace SongCapture
         public static uint CurrentResolution = 0;
         private static bool closed = false, recording = false;
         private static string audioName;
+        private static List<MMDevice> wasapis = new List<MMDevice>();
         public static int[] wd = { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
         public static int[] wu = { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
         public static bool[] ws = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
@@ -68,6 +61,14 @@ namespace SongCapture
         {
             TimeBeginPeriod(1);
             NtSetTimerResolution(1, true, ref CurrentResolution);
+            var enumerator = new MMDeviceEnumerator();
+            MMDevice wasapi = null;
+            foreach (var mmdevice in enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active))
+            {
+                wasapi = mmdevice;
+                wasapis.Add(mmdevice);
+                comboBox1.Items.Add(mmdevice.DeviceFriendlyName);
+            }
             Task.Run(() => Start());
         }
         private void Form1_KeyDown(object sender, KeyEventArgs e)
@@ -117,7 +118,7 @@ namespace SongCapture
         {
             button1.Text = "Start";
             recording = false;
-            System.Threading.Thread.Sleep(2000);
+            Thread.Sleep(5000);
             ConvertWavMP3(audioName);
             this.WindowState = FormWindowState.Minimized;
             Task.Factory.StartNew(() => openDirectory());
@@ -126,10 +127,10 @@ namespace SongCapture
         private void recordingSound()
         {
             string localDate = DateTime.Now.ToString();
-            audioName = localDate.Replace(" ", " -").Replace("/", "-").Replace(":", "-") + ".wav";
+            audioName = localDate.Replace(" ", "-").Replace("/", "-").Replace(":", "-") + ".wav";
             if (textBox1.Text == audioName)
             {
-                audioName = localDate.Replace(" ", " -").Replace("/", "-").Replace(":", "-") + ".wav";
+                audioName = localDate.Replace(" ", "-").Replace("/", "-").Replace(":", "-") + ".wav";
                 textBox1.Text = audioName;
             }
             else if (textBox1.Text != "")
@@ -140,20 +141,25 @@ namespace SongCapture
             {
                 textBox1.Text = audioName;
             }
-            CSCore.SoundIn.WasapiCapture capture = new CSCore.SoundIn.WasapiLoopbackCapture();
-            capture.Initialize();
-            WaveWriter wavewriter = new WaveWriter(audioName, capture.WaveFormat);
-            capture.DataAvailable += (sound, card) =>
+            var capture = new NAudio.Wave.WasapiLoopbackCapture();
+            var writer = new WaveFileWriter(Path.Combine(Application.StartupPath, audioName), capture.WaveFormat);
+            capture.DataAvailable += (s, a) =>
             {
-                wavewriter.Write(card.Data, card.Offset, card.ByteCount);
+                writer.Write(a.Buffer, 0, a.BytesRecorded);
+                writer.Flush();
+            }; 
+            capture.RecordingStopped += (s, a) =>
+            {
+                writer.Dispose();
+                writer = null;
+                capture.Dispose();
             };
-            capture.Start();
+            capture.StartRecording();
             for (int count = 0; count <= 60 * 60 * 1000; count++)
             {
                 if (!recording | count == 60 * 60 * 1000)
                 {
-                    capture.Stop();
-                    wavewriter.Dispose();
+                    capture.StopRecording();
                     break;
                 }
                 Thread.Sleep(1);
