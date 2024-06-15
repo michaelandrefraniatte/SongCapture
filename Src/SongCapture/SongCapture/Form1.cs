@@ -34,6 +34,7 @@ namespace SongCapture
         private static bool closed = false, recording = false;
         private static string audioName;
         private static List<MMDevice> wasapis = new List<MMDevice>();
+        private static WasapiOut wasapiOut = new WasapiOut();
         public static int[] wd = { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
         public static int[] wu = { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
         public static bool[] ws = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
@@ -153,8 +154,14 @@ namespace SongCapture
                 writer.Dispose();
                 writer = null;
                 capture.Dispose();
+                wasapiOut.Stop();
             };
             capture.StartRecording();
+            var device = new MMDeviceEnumerator().GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
+            var silenceProvider = new SilenceProvider(capture.WaveFormat);
+            wasapiOut = new WasapiOut(device, AudioClientShareMode.Shared, false, 250);
+            wasapiOut.Init(silenceProvider);
+            wasapiOut.Play();
             for (int count = 0; count <= 60 * 60 * 1000; count++)
             {
                 if (!recording | count == 60 * 60 * 1000)
