@@ -9,6 +9,7 @@ using System.Threading;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
 using NAudio.Lame;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace SongCapture
 {
@@ -34,7 +35,9 @@ namespace SongCapture
         private static bool closed = false, recording = false;
         private static string audioName;
         private static List<MMDevice> wasapis = new List<MMDevice>();
-        private static WasapiOut wasapiOut = new WasapiOut();
+        private static WasapiOut wasapiOut;
+        private static WasapiLoopbackCapture capture;
+        private static WaveFileWriter writer;
         public static int[] wd = { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
         public static int[] wu = { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
         public static bool[] ws = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
@@ -70,6 +73,7 @@ namespace SongCapture
                 wasapis.Add(mmdevice);
                 comboBox1.Items.Add(mmdevice.DeviceFriendlyName);
             }
+            comboBox1.SelectedIndex = 0;
             Task.Run(() => Start());
         }
         private void Form1_KeyDown(object sender, KeyEventArgs e)
@@ -142,8 +146,15 @@ namespace SongCapture
             {
                 textBox1.Text = audioName;
             }
-            var capture = new NAudio.Wave.WasapiLoopbackCapture();
-            var writer = new WaveFileWriter(Path.Combine(Application.StartupPath, audioName), capture.WaveFormat);
+            if (comboBox1.SelectedIndex < 1)
+            {
+                capture = new NAudio.Wave.WasapiLoopbackCapture();
+            }
+            else
+            {
+                capture = new NAudio.Wave.WasapiLoopbackCapture(wasapis[comboBox1.SelectedIndex]);
+            }
+            writer = new WaveFileWriter(Path.Combine(Application.StartupPath, audioName), capture.WaveFormat);
             capture.DataAvailable += (s, a) =>
             {
                 writer.Write(a.Buffer, 0, a.BytesRecorded);
